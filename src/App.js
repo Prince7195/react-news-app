@@ -1,9 +1,18 @@
 import React from 'react';
 import { Grid, Row, FormGroup } from "react-bootstrap";
 import PropTypes from 'prop-types';
+import { sortBy } from 'lodash';
 
 import data from './data';
 import { PATH_BASE, PATH_SEARCH, PARAM_SEARCH, DEFAULT_QUERY, PARAM_PAGE, DEFAULT_PAGE, PARAM_HPP, DEFAULT_HPP } from './constants';
+
+const SORT = {
+  NONE: list => list,
+  TITLE: list => sortBy(list, 'title'),
+  AUTHOR: list => sortBy(list, 'author'),
+  COMMENTS: list => sortBy(list, 'num_comments').reverse(),
+  POINTS: list => sortBy(list, 'points').reverse(),
+}
 
 const url = `${PATH_BASE}${PATH_SEARCH}?${PARAM_SEARCH}${DEFAULT_QUERY}&${PARAM_PAGE}${DEFAULT_PAGE}&${PARAM_HPP}${DEFAULT_HPP}`;
 console.log(url);
@@ -29,7 +38,8 @@ class App extends React.Component {
       results: null,
       searchKey: '',
       searchTerm: DEFAULT_QUERY,
-      isLoading: false
+      isLoading: false,
+      sortKey: 'NONE'
     }
 
     // bind the functions to this (app.component)
@@ -38,7 +48,13 @@ class App extends React.Component {
     this.fetchTopStories = this.fetchTopStories.bind(this);
     this.setTopStories = this.setTopStories.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
+    this.onSort = this.onSort.bind(this);
 
+  }
+
+  // shorting function
+  onSort(sortKey) {
+    this.setState({sortKey});
   }
 
   // check top stories search term
@@ -103,7 +119,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { results, searchTerm, searchKey, isLoading } = this.state;
+    const { results, searchTerm, searchKey, isLoading, sortKey } = this.state;
 
     const page = (results && results[searchKey] && results[searchKey].page) || 0;
 
@@ -130,6 +146,8 @@ class App extends React.Component {
             {results &&
               <Table 
                 list={list}
+                sortKey={sortKey}
+                onSort={this.onSort}
                 searchTerm={searchTerm}
                 removeItem={this.removeItem}
               />
@@ -185,12 +203,30 @@ class Search extends React.Component {
   }
 }
 
-const Table = ({ list, searchTerm, removeItem }) => {
+const Table = ({ list, searchTerm, removeItem, sortKey, onSort }) => {
   return (
     <div className="col-sm-10 col-sm-offset-1" >
+      <div>
+        <SortBtn
+          sortKey={'TITLE'}
+          onSort={onSort}
+        >TITLE</SortBtn>
+        <SortBtn
+          sortKey={'AUTHOR'}
+          onSort={onSort}
+        >AUTHOR</SortBtn>
+        <SortBtn
+          sortKey={'COMMENTS'}
+          onSort={onSort}
+        >COMMENTS</SortBtn>
+        <SortBtn
+          sortKey={'POINTS'}
+          onSort={onSort}
+        >POINTS</SortBtn>
+      </div>
       {
         // list.filter(isSearched(searchTerm)).map(
-        list.map(
+        SORT[sortKey](list).map(
           (item) => {
             return (
               <div key={item.objectID} >
@@ -243,5 +279,13 @@ const Loading = () => {
 }
 
 const ButtonWithLoading = withLoading(Button);
+
+const SortBtn = ({ sortKey, onSort, children }) => {
+   return <Button
+      onClick={() => onSort(sortKey)}
+    >
+      {children}
+    </Button>
+}
 
 export default App;
