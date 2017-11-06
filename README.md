@@ -81,3 +81,23 @@ github publishing:
 https://help.github.com/articles/adding-a-file-to-a-repository-using-the-command-line/
 
 https://help.github.com/articles/configuring-a-publishing-source-for-github-pages/
+
+How to publish:
+
+Step1: Push all codes to the git hub
+
+Step2: Add "hompage": "https://username.github.io/repository-name"   after the scripts object in the packet.json
+
+Step3: Add basename="/repository-name" to the mainRouter element
+
+Step4: In cmd run the command "npm run build" that it will create the production built file inside the project folder.
+
+Step5: Again run the command "npm install --save-dev gh-pages" that is used to publish the project.
+
+Step6: Add "predeploy": "npm run build", "deploy": "gh-pages -d build" inside the scripts json object in packet.json
+
+Step7: Then run command "npm run deploy" in cmd inside the current project. It gives the message as "Published" if the process is successful.
+
+Step8: Find the link for live of that app in the settings tab of that repository in Github pages container.
+
+Open the link and see your output.
