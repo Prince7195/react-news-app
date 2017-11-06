@@ -12,7 +12,7 @@ import Javascript from './components/Javascript';
 import Python from './components/Python';
 
 const Root = () => 
-<Router>
+<Router basename="/react-news-app" >
     <div>
         <Navbar>
             <Navbar.Header>
